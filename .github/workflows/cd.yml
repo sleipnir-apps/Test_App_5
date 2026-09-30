@@ -205,6 +205,7 @@ jobs:
           JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
           JWT_ACCESS_EXPIRES_IN=15m
           JWT_REFRESH_EXPIRES_IN=7d
+          CORS_ORIGINS=https://test-app-5.sleipnir.ovh
           EOF
           chmod 600 /tmp/test-app-5-deploy/.env.server
 
