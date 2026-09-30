@@ -200,18 +200,17 @@ jobs:
           cat > /tmp/test-app-5-deploy/.env.server << EOF
           NODE_ENV=production
           PORT=3000
-          MONGODB_URI=${MONGODB_URI}
+          MONGO_URL=${MONGODB_URI}
           JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
           JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
           JWT_ACCESS_EXPIRES_IN=15m
           JWT_REFRESH_EXPIRES_IN=7d
+          CORS_ORIGINS=https://test-app-5.sleipnir.ovh
           EOF
           chmod 600 /tmp/test-app-5-deploy/.env.server
 
-      - name: Copy docker-compose and env files to server
+      - name: Copy env file to server
         run: |
-          scp apps/api/docker-compose.yml ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.BACKEND_DIR }}/docker-compose.yml
-          scp apps/mobile/docker-compose.yml ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.FRONTEND_DIR }}/docker-compose.yml
           scp /tmp/test-app-5-deploy/.env.server ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.BACKEND_DIR }}/.env
 
       - name: Docker login on server
@@ -221,21 +220,82 @@ jobs:
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} \
             "echo '${GHCR_TOKEN}' | docker login ${{ env.REGISTRY }} -u ${{ github.repository_owner }} --password-stdin"
 
-      - name: Deploy backend API on server
+      - name: Generate docker-compose and deploy backend
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          BACKEND_IMAGE: ${{ env.BACKEND_IMAGE_NAME }}
+          BACKEND_DIR: ${{ env.BACKEND_DIR }}
+          PROJECT: n0md3l4pp
+          API_DOMAIN: n0md3l4pp-api.sleipnir.ovh
         run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "
-            cd projects/${{ env.BACKEND_DIR }}
-            docker compose pull
-            docker compose up -d || (echo 'Backend deploy failed, rolling back...' && docker compose down && docker compose up -d --no-pull)
-          "
+          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} \
+            REGISTRY="$REGISTRY" REPO_OWNER="$REPO_OWNER" \
+            BACKEND_IMAGE="$BACKEND_IMAGE" BACKEND_DIR="$BACKEND_DIR" \
+            PROJECT="$PROJECT" API_DOMAIN="$API_DOMAIN" \
+            bash << 'ENDSSH'
+            printf '%s\n' \
+              "services:" \
+              "  api:" \
+              "    image: ${REGISTRY}/${REPO_OWNER}/${BACKEND_IMAGE}:latest" \
+              "    restart: unless-stopped" \
+              "    env_file: projects/${BACKEND_DIR}/.env" \
+              "    labels:" \
+              "      - \"traefik.enable=true\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api.rule=Host(\`${API_DOMAIN}\`)\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api.entrypoints=websecure\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api.tls.certresolver=letsencrypt\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api-http.rule=Host(\`${API_DOMAIN}\`)\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api-http.entrypoints=web\"" \
+              "      - \"traefik.http.routers.${PROJECT}-api-http.middlewares=${PROJECT}-api-redirect-to-https\"" \
+              "      - \"traefik.http.middlewares.${PROJECT}-api-redirect-to-https.redirectscheme.scheme=https\"" \
+              "      - \"traefik.http.services.${PROJECT}-api.loadbalancer.server.port=3000\"" \
+              "networks:" \
+              "  default:" \
+              "    external: true" \
+              "    name: traefik_default" \
+              > projects/${BACKEND_DIR}/docker-compose.yml
 
-      - name: Deploy frontend on server
+            cd projects/${BACKEND_DIR} && docker compose pull && (docker compose up -d || (echo 'Backend deploy failed, rolling back...' && docker compose down && docker compose up -d --no-pull))
+          ENDSSH
+
+      - name: Generate docker-compose and deploy frontend
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE_NAME }}
+          FRONTEND_DIR: ${{ env.FRONTEND_DIR }}
+          PROJECT: n0md3l4pp
+          DOMAIN: n0md3l4pp.sleipnir.ovh
         run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "
-            cd projects/${{ env.FRONTEND_DIR }}
-            docker compose pull
-            docker compose up -d || (echo 'Frontend deploy failed, rolling back...' && docker compose down && docker compose up -d --no-pull)
-          "
+          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} \
+            REGISTRY="$REGISTRY" REPO_OWNER="$REPO_OWNER" \
+            FRONTEND_IMAGE="$FRONTEND_IMAGE" FRONTEND_DIR="$FRONTEND_DIR" \
+            PROJECT="$PROJECT" DOMAIN="$DOMAIN" \
+            bash << 'ENDSSH'
+            printf '%s\n' \
+              "services:" \
+              "  front:" \
+              "    image: ${REGISTRY}/${REPO_OWNER}/${FRONTEND_IMAGE}:latest" \
+              "    restart: unless-stopped" \
+              "    labels:" \
+              "      - \"traefik.enable=true\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front.rule=Host(\`${DOMAIN}\`)\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front.entrypoints=websecure\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front.tls.certresolver=letsencrypt\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front-http.rule=Host(\`${DOMAIN}\`)\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front-http.entrypoints=web\"" \
+              "      - \"traefik.http.routers.${PROJECT}-front-http.middlewares=${PROJECT}-front-redirect-to-https\"" \
+              "      - \"traefik.http.middlewares.${PROJECT}-front-redirect-to-https.redirectscheme.scheme=https\"" \
+              "      - \"traefik.http.services.${PROJECT}-front.loadbalancer.server.port=80\"" \
+              "networks:" \
+              "  default:" \
+              "    external: true" \
+              "    name: traefik_default" \
+              > projects/${FRONTEND_DIR}/docker-compose.yml
+
+            cd projects/${FRONTEND_DIR} && docker compose pull && (docker compose up -d || (echo 'Frontend deploy failed, rolling back...' && docker compose down && docker compose up -d --no-pull))
+          ENDSSH
 
       - name: Verify deployment health
         run: |

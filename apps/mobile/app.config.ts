@@ -13,8 +13,8 @@
 import type { ExpoConfig } from "expo/config";
 
 const BASE_NAME = "Test App 5";
-const BASE_PACKAGE = "com.sleipnir.test-app-5";
-const BASE_BUNDLE_ID = "com.sleipnir.test-app-5";
+const BASE_PACKAGE = "com.sleipnir.TestApp5";
+const BASE_BUNDLE_ID = "com.sleipnir.TestApp5";
 
 export default (): ExpoConfig => {
   const variant = process.env.APP_VARIANT ?? "";
@@ -73,6 +73,12 @@ export default (): ExpoConfig => {
     },
     extra: {
       appVariant: variant,
+      // Project ID EAS (expo.dev → Projects → Settings). Renseigné à la
+      // main après `bunx eas init --id <ID>` : la config étant dynamique,
+      // EAS CLI ne peut pas l'écrire automatiquement (voir README).
+      eas: {
+        projectId: "1ac27b3c-fc22-4412-90f8-27eca917c306",
+      },
     },
   };
 
