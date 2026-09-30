@@ -17,7 +17,7 @@ This document outlines the technology stack, architecture, and coding standards 
 
 ## Golden Rules (Non-Negotiable)
 
-1.  **Always use Bun.** `bun run <script>`, `bun install`, `bun test`, `bun build`. Never use npm, yarn, pnpm, npx, node, jest, vitest, webpack, or esbuild. Bun auto-loads `.env` — never use dotenv.
+1.  **Always use Bun.** `bun run <script>`, `bun install`, `bun run test`, `bun build`. Never use npm, yarn, pnpm, npx, node, jest, vitest, webpack, or esbuild. Bun auto-loads `.env` — never use dotenv.
 2.  **Contracts-first.** Any data shape shared between the API and the mobile app MUST be defined once in `packages/contracts` (Zod schema + inferred DTO type) and imported by both sides. Never duplicate a type in `apps/api` and `apps/mobile`.
 3.  **Verify before committing.** Lefthook runs `bun typecheck` and `bun lint` on every `pre-commit`, and validates Conventional Commits on `commit-msg`. **Never bypass these hooks** (`--no-verify` is forbidden). Before writing any commit, run locally and fix all errors until they pass clean:
     ```sh
@@ -53,7 +53,7 @@ item.routes.ts      Fastify route registration + Zod route schemas
 item.service.ts     Business logic (owns errors, no Fastify types)
 item.repository.ts  MongoDB queries only (Collection, Filter, indexes)
 item.schema.ts      Fastify route-level schema (params, querystring, response)
-items.test.ts       bun test suite (mongodb-memory-server)
+items.test.ts       bun run test suite (mongodb-memory-server)
 ```
 
 1.  **Layering**: routes → service → repository. Routes parse & delegate; services hold business logic; repositories hold MongoDB queries. Never call the repository from a route, and never import Fastify types in a service.
@@ -78,7 +78,7 @@ items.test.ts       bun test suite (mongodb-memory-server)
 
 ## Testing Rules
 
-*   Use `bun test` with `bun:test` (`import { test, expect } from "bun:test"`). No jest, vitest, or testing-library unless explicitly requested.
+*   Use `bun run test` with `bun:test` (`import { test, expect } from "bun:test"`). No jest, vitest, or testing-library unless explicitly requested.
 *   API tests use the `mongodb-memory-server` preload (`src/test/setup.ts`) and run with `bun run test:api`. Every new service method gets a test in the module's `*.test.ts`.
 *   Tests are written in **English**.
 
