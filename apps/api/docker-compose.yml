@@ -1,0 +1,28 @@
+services:
+  n0md3l4pp-api:
+    image: ghcr.io/corentinclero/n0md3l4pp-api:latest
+    container_name: n0md3l4pp-api
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_EXPIRES_IN=${JWT_ACCESS_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n0md3l4pp-api.rule=Host(`n0md3l4pp-api.sleipnir.ovh`)"
+      - "traefik.http.routers.n0md3l4pp-api.entrypoints=websecure"
+      - "traefik.http.routers.n0md3l4pp-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n0md3l4pp-api-http.rule=Host(`n0md3l4pp-api.sleipnir.ovh`)"
+      - "traefik.http.routers.n0md3l4pp-api-http.entrypoints=web"
+      - "traefik.http.routers.n0md3l4pp-api-http.middlewares=n0md3l4pp-api-redirect-to-https"
+      - "traefik.http.middlewares.n0md3l4pp-api-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.services.n0md3l4pp-api.loadbalancer.server.port=3000"
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: traefik_default

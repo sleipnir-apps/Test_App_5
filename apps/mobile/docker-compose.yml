@@ -1,0 +1,20 @@
+services:
+  n0md3l4pp:
+    image: ghcr.io/corentinclero/n0md3l4pp-front:latest
+    container_name: n0md3l4pp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n0md3l4pp.rule=Host(`n0md3l4pp.sleipnir.ovh`)"
+      - "traefik.http.routers.n0md3l4pp.entrypoints=websecure"
+      - "traefik.http.routers.n0md3l4pp.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n0md3l4pp-http.rule=Host(`n0md3l4pp.sleipnir.ovh`)"
+      - "traefik.http.routers.n0md3l4pp-http.entrypoints=web"
+      - "traefik.http.routers.n0md3l4pp-http.middlewares=n0md3l4pp-redirect-to-https"
+      - "traefik.http.middlewares.n0md3l4pp-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.services.n0md3l4pp.loadbalancer.server.port=80"
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: traefik_default
