@@ -58,18 +58,18 @@ jobs:
       - name: Check Expo token
         id: check
         env:
-          EXPO_TOKEN: ${{ env.N0MD3L4PP_EXPO_TOKEN }}
+          EXPO_TOKEN: ${{ env.TEST_APP_5_EXPO_TOKEN }}
         run: |
           if [ -z "$EXPO_TOKEN" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "📱 Pas de token Expo (N0MD3L4PP_EXPO_TOKEN absent d'Infisical) — build mobile ignoré."
+            echo "📱 Pas de token Expo (TEST_APP_5_EXPO_TOKEN absent d'Infisical) — build mobile ignoré."
             echo "   Pour activer les builds mobiles : voir README, section ⚠️ EAS builds."
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "▶ Token Expo présent — builds mobiles activés."
           fi
 
-  # ─── Push sur develop → APK "n0md3l4pP staging" ───────────────────
+  # ─── Push sur develop → APK "Test App 5 staging" ───────────────────
   build-preview:
     name: Build APK (staging variant)
     needs: [template-guard, expo-guard]
@@ -96,7 +96,7 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ env.N0MD3L4PP_EXPO_TOKEN }}
+          token: ${{ env.TEST_APP_5_EXPO_TOKEN }}
 
       - name: Submit EAS build (preview)
         working-directory: ${{ env.EAS_PROJECT_DIR }}
@@ -104,7 +104,7 @@ jobs:
 
   # ─── Push sur main → APK prod installable à côté du staging ───────
   # Tant que le projet n'est pas publié sur les stores, on distribue un
-  # APK "production-apk" (nom standard, package com.sleipnir.n0md3l4pp)
+  # APK "production-apk" (nom standard, package com.sleipnir.test-app-5)
   # qui coexiste sur le téléphone avec l'APK staging (package .staging).
   build-production-apk:
     name: Build APK (prod variant)
@@ -132,16 +132,16 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ env.N0MD3L4PP_EXPO_TOKEN }}
+          token: ${{ env.TEST_APP_5_EXPO_TOKEN }}
 
       - name: Submit EAS build (production-apk)
         working-directory: ${{ env.EAS_PROJECT_DIR }}
         run: eas build --platform android --profile production-apk --non-interactive --no-wait
 
-  # ─── PR avec label "mobile" → APK "n0md3l4pP pr-N" ────────────────
+  # ─── PR avec label "mobile" → APK "Test App 5 pr-N" ────────────────
   # Chaque PR labellisée "mobile" produit un APK séparément installable
-  # (package com.sleipnir.n0md3l4pp.prN) qui pointe vers la preview back
-  # de la PR (https://pr-N.api.n0md3l4pp.staging.sleipnir.ovh).
+  # (package com.sleipnir.test-app-5.prN) qui pointe vers la preview back
+  # de la PR (https://pr-N.api.test-app-5.staging.sleipnir.ovh).
   build-pr:
     name: Build APK (PR #${{ github.event.pull_request.number }})
     needs: [template-guard, expo-guard]
@@ -178,12 +178,12 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ env.N0MD3L4PP_EXPO_TOKEN }}
+          token: ${{ env.TEST_APP_5_EXPO_TOKEN }}
 
       - name: Submit EAS build (pr)
         working-directory: ${{ env.EAS_PROJECT_DIR }}
         env:
-          EXPO_PUBLIC_API_URL: https://pr-${{ env.PR_NUMBER }}.api.n0md3l4pp.staging.sleipnir.ovh
+          EXPO_PUBLIC_API_URL: https://pr-${{ env.PR_NUMBER }}.api.test-app-5.staging.sleipnir.ovh
           APP_VARIANT: pr-${{ env.PR_NUMBER }}
         run: eas build --platform android --profile pr --non-interactive --no-wait
 
@@ -192,7 +192,7 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request.number;
-            const body = `## 📱 Build APK (PR) soumis\n\nUn build EAS Android a été soumis pour cette PR :\n- **App** : n0md3l4pP pr-${pr} (installable à côté des autres variantes)\n- **API** : https://pr-${pr}.api.n0md3l4pp.staging.sleipnir.ovh\n\nLe lien de téléchargement de l'APK sera disponible sur [expo.dev](https://expo.dev) → Builds quand il sera terminé.`;
+            const body = `## 📱 Build APK (PR) soumis\n\nUn build EAS Android a été soumis pour cette PR :\n- **App** : Test App 5 pr-${pr} (installable à côté des autres variantes)\n- **API** : https://pr-${pr}.api.test-app-5.staging.sleipnir.ovh\n\nLe lien de téléchargement de l'APK sera disponible sur [expo.dev](https://expo.dev) → Builds quand il sera terminé.`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -204,7 +204,7 @@ jobs:
   # Nécessite un compte Google Play Developer (25 $ unique) pour la
   # soumission store. Pour activer :
   #   1. Acheter le compte Google Play Developer et créer l'app dans
-  #      la Play Console (package: com.sleipnir.n0md3l4pp).
+  #      la Play Console (package: com.sleipnir.test-app-5).
   #   2. Décommenter le job ci-dessous.
   #   3. Configurer `eas submit -p android --latest` avec les credentials
   #      (service account JSON dans Infisical).
@@ -235,7 +235,7 @@ jobs:
   #       uses: expo/expo-github-action@v8
   #       with:
   #         eas-version: latest
-  #         token: ${{ env.N0MD3L4PP_EXPO_TOKEN }}
+  #         token: ${{ env.TEST_APP_5_EXPO_TOKEN }}
   #
   #     - name: Submit EAS build (production)
   #       working-directory: ${{ env.EAS_PROJECT_DIR }}
