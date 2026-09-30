@@ -175,7 +175,8 @@ jobs:
       needs.expo-guard.outputs.ready == 'true' &&
       github.event_name == 'pull_request' &&
       contains(github.event.pull_request.labels.*.name, 'mobile') &&
-      github.event.action != 'closed'
+      github.event.action != 'closed' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'mobile')
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -211,11 +212,26 @@ jobs:
           eas-version: latest
           token: ${{ env.EXPO_TOKEN }}
 
-      - name: Submit EAS build (pr)
+      - name: Configure EAS PR build
         working-directory: ${{ env.EAS_PROJECT_DIR }}
         env:
-          EXPO_PUBLIC_API_URL: https://pr-${{ env.PR_NUMBER }}.api.test-app-5.staging.sleipnir.ovh
-          APP_VARIANT: pr-${{ env.PR_NUMBER }}
+          PR_NUMBER: ${{ env.PR_NUMBER }}
+        run: |
+          bun -e '
+            const file = "eas.json";
+            const config = await Bun.file(file).json();
+
+            config.build.pr.env = {
+              ...(config.build.pr.env ?? {}),
+              APP_VARIANT: `pr-${process.env.PR_NUMBER}`,
+              EXPO_PUBLIC_API_URL: `https://pr-${process.env.PR_NUMBER}.api.test-app-5.staging.sleipnir.ovh`,
+            };
+
+            await Bun.write(file, `${JSON.stringify(config, null, 2)}\n`);
+          '
+
+      - name: Submit EAS build (pr)
+        working-directory: ${{ env.EAS_PROJECT_DIR }}
         run: eas build --platform android --profile pr --non-interactive --no-wait
 
       - name: Comment build info on PR
