@@ -150,8 +150,9 @@ jobs:
 
   # ─── DEPLOY (opened / synchronize / reopened) ───────────────────
   deploy-preview:
-    needs: [api-checks, mobile-checks, contracts-checks]
+    needs: [template-guard, api-checks, mobile-checks, contracts-checks]
     if: >
+      needs.template-guard.outputs.initialized == 'true' &&
       (
         github.event.action != 'labeled' ||
         github.event.label.name == 'preview'
