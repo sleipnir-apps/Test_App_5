@@ -10,7 +10,6 @@ on:
       - develop
 
 env:
-  REPO_OWNER_LOWERCASE: corentinclero
   REGISTRY: ghcr.io
   PROJECT_NAME: test-app-5
   BACKEND_IMAGE_NAME: test-app-5-api
@@ -169,6 +168,9 @@ jobs:
       cancel-in-progress: true
 
     steps:
+      - name: Compute lowercase owner
+        run: echo "REPO_OWNER_LOWERCASE=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.PR_HEAD_SHA }}
@@ -428,7 +430,6 @@ jobs:
       cancel-in-progress: false
 
     env:
-      REPO_OWNER_LOWERCASE: corentinclero
       REGISTRY: ghcr.io
       PROJECT_NAME: test-app-5
       BACKEND_IMAGE_NAME: test-app-5-api
@@ -437,6 +438,9 @@ jobs:
       SUBDOMAIN_SUFFIX: test-app-5.staging.sleipnir.ovh
 
     steps:
+      - name: Compute lowercase owner
+        run: echo "REPO_OWNER_LOWERCASE=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - name: Fetch Server Infrastructure Secrets
         uses: Infisical/secrets-action@v1.0.9
         with:
@@ -641,6 +645,9 @@ jobs:
       cancel-in-progress: false
 
     steps:
+      - name: Compute lowercase owner
+        run: echo "REPO_OWNER_LOWERCASE=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
 
       - uses: docker/setup-buildx-action@v3
