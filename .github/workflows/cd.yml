@@ -226,8 +226,8 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           BACKEND_IMAGE: ${{ env.BACKEND_IMAGE_NAME }}
           BACKEND_DIR: ${{ env.BACKEND_DIR }}
-          PROJECT: test-api-5
-          API_DOMAIN: test-api-5-api.sleipnir.ovh
+          PROJECT: test-app-5
+          API_DOMAIN: test-app-5-api.sleipnir.ovh
         run: |
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} \
             REGISTRY="$REGISTRY" REPO_OWNER="$REPO_OWNER" \
@@ -265,8 +265,8 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE_NAME }}
           FRONTEND_DIR: ${{ env.FRONTEND_DIR }}
-          PROJECT: test-api-5
-          DOMAIN: test-api-5.sleipnir.ovh
+          PROJECT: test-app-5
+          DOMAIN: test-app-5.sleipnir.ovh
         run: |
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} \
             REGISTRY="$REGISTRY" REPO_OWNER="$REPO_OWNER" \
@@ -308,7 +308,7 @@ jobs:
             docker compose ps
           "
 
-      - name: Clean up unused test-api-5 images
+      - name: Clean up unused test-app-5 images
         run: |
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "
             docker images --format '{{.Repository}}:{{.Tag}}' \
