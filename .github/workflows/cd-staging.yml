@@ -153,7 +153,6 @@ jobs:
   deploy-preview:
     needs: [api-checks, mobile-checks, contracts-checks]
     if: >
-      needs.template-guard.outputs.initialized == 'true' &&
       (
         github.event.action != 'labeled' ||
         github.event.label.name == 'preview'
@@ -622,7 +621,7 @@ jobs:
         run: bun run typecheck
 
       - name: Run tests
-        run: bun test
+        run: bun run test
 
       - name: Lint code
         run: bun run lint
@@ -631,7 +630,6 @@ jobs:
     name: Deploy Persistent Staging
     needs: [staging-checks]
     if: >
-      needs.template-guard.outputs.initialized == 'true' &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
