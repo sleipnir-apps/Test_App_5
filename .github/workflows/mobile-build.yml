@@ -63,7 +63,7 @@ jobs:
         env:
           EXPO_TOKEN: ${{ env.EXPO_TOKEN }}
         run: |
-          EAS_PROJECT_ID=$(grep -A2 '"eas"' apps/mobile/app.config.ts | grep projectId | sed 's/.*projectId: "\(.*\)".*/\1/')
+          EAS_PROJECT_ID=$(sed -n 's/.*projectId: "\([^"]*\)".*/\1/p' apps/mobile/app.config.ts | head -1)
 
           if [ -z "$EXPO_TOKEN" ] && [ -z "$EAS_PROJECT_ID" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
