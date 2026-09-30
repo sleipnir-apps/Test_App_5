@@ -147,6 +147,12 @@ jobs:
           env-slug: prod
           export-type: env
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Setup EAS CLI
         uses: expo/expo-github-action@v8
         with:
@@ -162,7 +168,7 @@ jobs:
   # (package com.sleipnir.test-app-5.prN) qui pointe vers la preview back
   # de la PR (https://pr-N.api.test-app-5.staging.sleipnir.ovh).
   build-pr:
-    name: Build APK (PR #${{ github.event.pull_request.number }})
+    name: Build APK (PR ${{ github.event.pull_request.number }})
     needs: [template-guard, expo-guard]
     if: >
       needs.template-guard.outputs.initialized == 'true' &&
@@ -192,6 +198,12 @@ jobs:
           project-slug: apps-x-tl-w
           env-slug: prod
           export-type: env
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Setup EAS CLI
         uses: expo/expo-github-action@v8
@@ -249,6 +261,12 @@ jobs:
   #         project-slug: apps-x-tl-w
   #         env-slug: prod
   #         export-type: env
+  #
+  #     - name: Setup Bun
+  #       uses: oven-sh/setup-bun@v2
+  #
+  #     - name: Install dependencies
+  #       run: bun install --frozen-lockfile
   #
   #     - name: Setup EAS CLI
   #       uses: expo/expo-github-action@v8

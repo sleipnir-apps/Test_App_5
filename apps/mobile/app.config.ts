@@ -13,8 +13,8 @@
 import type { ExpoConfig } from "expo/config";
 
 const BASE_NAME = "Test App 5";
-const BASE_PACKAGE = "com.sleipnir.test-app-5";
-const BASE_BUNDLE_ID = "com.sleipnir.test-app-5";
+const BASE_PACKAGE = "com.sleipnir.TestApp5";
+const BASE_BUNDLE_ID = "com.sleipnir.TestApp5";
 
 export default (): ExpoConfig => {
   const variant = process.env.APP_VARIANT ?? "";
