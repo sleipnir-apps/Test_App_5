@@ -7,7 +7,10 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
+# NOTE: expo-env.d.ts est volontairement PAS ignoré. Expo le régénère
+# localement, mais il est requis par le typecheck CI (déclarations des
+# imports *.css / *.module.css / assets) — sans lui, `tsc` échoue sur
+# un checkout frais.
 
 # Native
 .kotlin/
