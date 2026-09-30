@@ -239,7 +239,7 @@ jobs:
               "  api:" \
               "    image: ${REGISTRY}/${REPO_OWNER}/${BACKEND_IMAGE}:latest" \
               "    restart: unless-stopped" \
-              "    env_file: projects/${BACKEND_DIR}/.env" \
+              "    env_file: .env" \
               "    labels:" \
               "      - \"traefik.enable=true\"" \
               "      - \"traefik.http.routers.${PROJECT}-api.rule=Host(\`${API_DOMAIN}\`)\"" \
