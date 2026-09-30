@@ -41,8 +41,8 @@ export default function RootLayout() {
     <AppProviders>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Head>
-          <title>N0md3l4pP</title>
-          <meta name="description" content="Noria" />
+          <title>Test App 5</title>
+          <meta name="description" content="Test App 5" />
         </Head>
         <AnimatedSplashOverlay />
         <RootNavigator />

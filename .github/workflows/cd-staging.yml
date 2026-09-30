@@ -271,6 +271,7 @@ jobs:
             "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}" \
             "JWT_ACCESS_EXPIRES_IN=15m" \
             "JWT_REFRESH_EXPIRES_IN=7d" \
+            "CORS_ORIGINS=https://pr-${{ env.PR_NUMBER }}.${{ env.SUBDOMAIN_SUFFIX }}" \
             > /tmp/preview-deploy/.env
           chmod 600 /tmp/preview-deploy/.env
 
@@ -746,6 +747,7 @@ jobs:
             "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}" \
             "JWT_ACCESS_EXPIRES_IN=15m" \
             "JWT_REFRESH_EXPIRES_IN=7d" \
+            "CORS_ORIGINS=https://${{ env.STAGING_SUBDOMAIN }}" \
             > /tmp/staging-deploy/.env
           chmod 600 /tmp/staging-deploy/.env
 
