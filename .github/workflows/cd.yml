@@ -10,8 +10,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE_NAME: n0md3l4pp-api
-  FRONTEND_IMAGE_NAME: n0md3l4pp-front
+  BACKEND_IMAGE_NAME: test-app-5-api
+  FRONTEND_IMAGE_NAME: test-app-5-front
 
 jobs:
   # ─── Garde-fou : ne rien lancer tant que le template n'est pas ────
@@ -126,7 +126,7 @@ jobs:
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,scope=frontend,mode=max
           build-args: |
-            EXPO_PUBLIC_API_URL=https://n0md3l4pp-api.sleipnir.ovh
+            EXPO_PUBLIC_API_URL=https://test-app-5-api.sleipnir.ovh
 
   deploy:
     needs: [publish-backend, publish-frontend]
@@ -135,8 +135,8 @@ jobs:
     # Pas de garde ici : publish-* sont déjà gated par template-guard,
     # et un job "needs" skippé skippe aussi ses dépendants.
     env:
-      BACKEND_DIR: n0md3l4pp-api
-      FRONTEND_DIR: n0md3l4pp-front
+      BACKEND_DIR: test-app-5-api
+      FRONTEND_DIR: test-app-5-front
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -188,16 +188,16 @@ jobs:
 
       - name: Create secure temporary directory
         run: |
-          mkdir -p /tmp/n0md3l4pp-deploy
-          chmod 700 /tmp/n0md3l4pp-deploy
+          mkdir -p /tmp/test-app-5-deploy
+          chmod 700 /tmp/test-app-5-deploy
 
       - name: Create .env file for backend
         env:
-          MONGODB_URI: ${{ env.N0MD3L4PP_MONGODB_URI }}
-          JWT_ACCESS_SECRET: ${{ env.N0MD3L4PP_JWT_ACCESS_SECRET }}
-          JWT_REFRESH_SECRET: ${{ env.N0MD3L4PP_JWT_REFRESH_SECRET }}
+          MONGODB_URI: ${{ env.TEST_APP_5_MONGODB_URI }}
+          JWT_ACCESS_SECRET: ${{ env.TEST_APP_5_JWT_ACCESS_SECRET }}
+          JWT_REFRESH_SECRET: ${{ env.TEST_APP_5_JWT_REFRESH_SECRET }}
         run: |
-          cat > /tmp/n0md3l4pp-deploy/.env.server << EOF
+          cat > /tmp/test-app-5-deploy/.env.server << EOF
           NODE_ENV=production
           PORT=3000
           MONGODB_URI=${MONGODB_URI}
@@ -206,13 +206,13 @@ jobs:
           JWT_ACCESS_EXPIRES_IN=15m
           JWT_REFRESH_EXPIRES_IN=7d
           EOF
-          chmod 600 /tmp/n0md3l4pp-deploy/.env.server
+          chmod 600 /tmp/test-app-5-deploy/.env.server
 
       - name: Copy docker-compose and env files to server
         run: |
           scp apps/api/docker-compose.yml ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.BACKEND_DIR }}/docker-compose.yml
           scp apps/mobile/docker-compose.yml ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.FRONTEND_DIR }}/docker-compose.yml
-          scp /tmp/n0md3l4pp-deploy/.env.server ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.BACKEND_DIR }}/.env
+          scp /tmp/test-app-5-deploy/.env.server ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:projects/${{ env.BACKEND_DIR }}/.env
 
       - name: Docker login on server
         env:
@@ -252,7 +252,7 @@ jobs:
         run: |
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "
             docker images --format '{{.Repository}}:{{.Tag}}' \
-              | grep -E 'n0md3l4pp-api|n0md3l4pp-front' \
+              | grep -E 'test-app-5-api|test-app-5-front' \
               | grep -v latest \
               | xargs -r docker rmi || true
           "
@@ -261,4 +261,4 @@ jobs:
         if: always()
         run: |
           rm -rf ~/.ssh
-          rm -rf /tmp/n0md3l4pp-deploy
+          rm -rf /tmp/test-app-5-deploy

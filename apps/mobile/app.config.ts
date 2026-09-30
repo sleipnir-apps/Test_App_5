@@ -4,17 +4,17 @@
 // PR preview).
 //
 // APP_VARIANT is set per EAS build profile (see apps/mobile/eas.json):
-//   - unset            -> "n0md3l4pP"                / com.sleipnir.n0md3l4pp
-//   - "staging"        -> "n0md3l4pP staging"        / com.sleipnir.n0md3l4pp.staging
-//   - "pr-42"          -> "n0md3l4pP pr-42"          / com.sleipnir.n0md3l4pp.pr42
+//   - unset            -> "Test App 5"                / com.sleipnir.test-app-5
+//   - "staging"        -> "Test App 5 staging"        / com.sleipnir.test-app-5.staging
+//   - "pr-42"          -> "Test App 5 pr-42"          / com.sleipnir.test-app-5.pr42
 //
 // The PR number is injected by the workflow (.github/workflows/mobile-build.yml)
 // via EAS Build env vars, so each PR gets a separately installable APK.
 import type { ExpoConfig } from "expo/config";
 
-const BASE_NAME = "n0md3l4pP";
-const BASE_PACKAGE = "com.sleipnir.n0md3l4pp";
-const BASE_BUNDLE_ID = "com.sleipnir.n0md3l4pp";
+const BASE_NAME = "Test App 5";
+const BASE_PACKAGE = "com.sleipnir.test-app-5";
+const BASE_BUNDLE_ID = "com.sleipnir.test-app-5";
 
 export default (): ExpoConfig => {
   const variant = process.env.APP_VARIANT ?? "";
@@ -22,11 +22,11 @@ export default (): ExpoConfig => {
 
   const config: ExpoConfig = {
     name: BASE_NAME,
-    slug: "n0md3l4pp",
+    slug: "test-app-5",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./src/assets/images/icon.png",
-    scheme: "n0md3l4pp",
+    scheme: "test-app-5",
     userInterfaceStyle: "automatic",
     ios: {
       bundleIdentifier: BASE_BUNDLE_ID,

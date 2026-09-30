@@ -1,7 +1,7 @@
 services:
-  n0md3l4pp-api:
-    image: ghcr.io/corentinclero/n0md3l4pp-api:latest
-    container_name: n0md3l4pp-api
+  test-app-5-api:
+    image: ghcr.io/corentinclero/test-app-5-api:latest
+    container_name: test-app-5-api
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -12,14 +12,14 @@ services:
       - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.n0md3l4pp-api.rule=Host(`n0md3l4pp-api.sleipnir.ovh`)"
-      - "traefik.http.routers.n0md3l4pp-api.entrypoints=websecure"
-      - "traefik.http.routers.n0md3l4pp-api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.n0md3l4pp-api-http.rule=Host(`n0md3l4pp-api.sleipnir.ovh`)"
-      - "traefik.http.routers.n0md3l4pp-api-http.entrypoints=web"
-      - "traefik.http.routers.n0md3l4pp-api-http.middlewares=n0md3l4pp-api-redirect-to-https"
-      - "traefik.http.middlewares.n0md3l4pp-api-redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.services.n0md3l4pp-api.loadbalancer.server.port=3000"
+      - "traefik.http.routers.test-app-5-api.rule=Host(`test-app-5-api.sleipnir.ovh`)"
+      - "traefik.http.routers.test-app-5-api.entrypoints=websecure"
+      - "traefik.http.routers.test-app-5-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.test-app-5-api-http.rule=Host(`test-app-5-api.sleipnir.ovh`)"
+      - "traefik.http.routers.test-app-5-api-http.entrypoints=web"
+      - "traefik.http.routers.test-app-5-api-http.middlewares=test-app-5-api-redirect-to-https"
+      - "traefik.http.middlewares.test-app-5-api-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.services.test-app-5-api.loadbalancer.server.port=3000"
     restart: unless-stopped
 
 networks:
