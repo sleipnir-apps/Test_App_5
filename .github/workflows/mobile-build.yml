@@ -105,6 +105,12 @@ jobs:
           env-slug: prod
           export-type: env
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Setup EAS CLI
         uses: expo/expo-github-action@v8
         with:
