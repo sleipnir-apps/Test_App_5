@@ -200,7 +200,7 @@ jobs:
           cat > /tmp/test-app-5-deploy/.env.server << EOF
           NODE_ENV=production
           PORT=3000
-          MONGODB_URI=${MONGODB_URI}
+          MONGO_URL=${MONGODB_URI}
           JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
           JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
           JWT_ACCESS_EXPIRES_IN=15m
